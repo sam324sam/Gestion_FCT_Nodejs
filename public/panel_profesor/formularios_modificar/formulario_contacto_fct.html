@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Aplicacion FCT</title>
     <link href="../../styles.css" rel="stylesheet">
 </head>
 
@@ -206,7 +206,7 @@
 
             for (let element of formulario.elements) {
                 if (element.name) {
-                    datos[element.name] = element.value; // Rellenar el objeto con los datos del formulario
+                    datos[element.name] = element.value || null;
                 }
             }
 

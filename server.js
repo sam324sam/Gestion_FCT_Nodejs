@@ -23,15 +23,15 @@ db.connect((err) => {
     console.log("Conectado a MySQL ✅");
 });
 
-// Configuración de la sesión
+// Configuración de la sesion
 app.use(session({
-    secret: 'tu-secreto',
+    secret: 'tu-secreto', // Cambiar esto por no se otra cosa
     resave: false,
     saveUninitialized: true,
 }));
 
 //Acceder a datps de la seccion
-app.get("/sesion", (req, res) => { //No sirve ahora de nada
+app.get("/sesion", (req, res) => {
     if (req.session.correo) {
         res.json({
             correo: req.session.correo,
