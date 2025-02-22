@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Aplicacion FCT</title>
     <link href="../../styles.css" rel="stylesheet">
 </head>
 
@@ -189,7 +189,7 @@
                             const formattedDate = date.toISOString().split('T')[0];
                             input.value = formattedDate;
                         } else {
-                            input.value = value;
+                            input.value = value || null;
                         }
                     }
                 });
