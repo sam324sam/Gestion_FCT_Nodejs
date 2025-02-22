@@ -62,6 +62,29 @@ header {
     color: #94d2bd;
 }
 
+/* Pagina inicio*/
+.inicio {
+    background-color: #f4f4f4; /* Fondo claro */
+    text-align: center; /* Centrar el contenido */
+    padding: 40px 20px; /* Espaciado alrededor del contenido */
+    border-radius: 10px; /* Bordes redondeados */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Sombra sutil */
+    margin: 20px; /* Margen para separar del resto */
+}
+
+.contenido-inicio {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.imagen-inicio {
+    width: 100%;
+    height: auto;
+    max-height: 600px;
+    border-radius: 10px;
+    margin-top: 20px;
+}
+
 /*Formulario*/
 form {
     max-width: 700px;

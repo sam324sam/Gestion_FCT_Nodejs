@@ -131,7 +131,7 @@
                             <td>${alumno.correo}</td>
                             <td>${alumno.telefono || "N/A"}</td>
                             <td>
-                                <button onclick="redirigirFormulario('formulario_datos.html?id=${alumnoId}&nombre=${encodeURIComponent(alumno.nombre_completo)}&empresa=${encodeURIComponent(alumno.empresa_asignada || '')}')">
+                                <button onclick="redirigirFormulario('formulario_convenio.html?id=${alumnoId}&nombre=${encodeURIComponent(alumno.nombre_completo)}&empresa=${encodeURIComponent(alumno.empresa_asignada || '')}')">
                                     Asignar datos
                                 </button>
                             </td>

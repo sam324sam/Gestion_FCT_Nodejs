@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aplicacion FCT</title>
     <link rel="stylesheet" href="../../styles.css">
+    <link rel="icon" href="../../img/logo.png" type="image/png">
 </head>
 
 <body>
@@ -149,10 +150,13 @@
                     await llenarSelectEmpresas();
                     // Llenar select con la empresa asignada (Para que este seleccionad)
                     alumnos.forEach(alumno => {
-                        const select = document.getElementById(`selectEmpresa-${alumno.id}`);
-                        // Asigna el valor de la empresa si existe
-                        if (alumno.empresa_asignada) {
-                            select.value = alumno.empresa_asignada;
+                        // lo volvi a repetir por que o si no lee los ids nulls y explota
+                        if (alumno.grado_curso == curso) {
+                            const select = document.getElementById(`selectEmpresa-${alumno.id}`);
+                            // Asigna el valor de la empresa si existe
+                            if (alumno.empresa_asignada) {
+                                select.value = alumno.empresa_asignada;
+                            }
                         }
                     });
                 }
@@ -182,7 +186,13 @@
         //Guardar empresa (No se me ocurrio una forma de hacerlo con add eventlisener)
         async function actualizarEmpresaAsignada(id, idSelectEmpresa) {
             const nombreEmpresa = document.getElementById(idSelectEmpresa).value || null; // Obtenemos el id de la empresa seleccionada y ver el valor que tiene (el null es por si selecciona el "")
-            const datos = { 'empresa_asignada': nombreEmpresa };
+            // para cambiar el estado automaticamente
+            let datos;
+            if (nombreEmpresa == null) {
+                datos = { 'empresa_asignada': nombreEmpresa, 'estado_fct': 'NO REALIZA PRACTICAS' };
+            } else {
+                datos = { 'empresa_asignada': nombreEmpresa, 'estado_fct': 'PENDIENTE ASIGNACION DE PRACTICAS' };
+            }
             const tabla = 'alumnos';
             console.log(datos);
             try {
