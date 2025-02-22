@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body>
+
+    <header>
+        <div class="logo">
+            <img class="logo_imagen" src="../../img/logo.png" alt="Logo">
+            <h1 class="titulo">Aplicación FCT</h1>
+        </div>
+        <nav class="navegacion">
+            <ul id="enlacesUsuarios">
+
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <form id="formulario" method="POST">
+            <h2>Registrar Información del Profesor</h2>
+            <label for="nombre_completo">Nombre Completo:</label>
+            <input type="text" id="nombre_completo" name="nombre_completo" required>
+            <br>
+            <label for="correo">Correo Electrónico:</label>
+            <input type="email" id="correo" name="correo" required>
+            <br>
+            <label for="telefono">Número de Teléfono:</label>
+            <input type="text" id="telefono" name="telefono">
+            <br>
+            <label for="direccion">Dirección:</label>
+            <textarea id="direccion" name="direccion"></textarea>
+            <br>
+            <label for="fecha_nacimiento">Fecha de Nacimiento:</label>
+            <input type="date" id="fecha_nacimiento" name="fecha_nacimiento">
+            <br>
+            <label for="genero">Género:</label>
+            <select id="genero" name="genero">
+                <option value="">Seleccionar</option>
+                <option value="masculino">Masculino</option>
+                <option value="femenino">Femenino</option>
+                <option value="otro">Otro</option>
+                <option value="prefiero_no_decirlo">Prefiero no decirlo</option>
+            </select>
+            <br>
+            <label for="rol">Rol:</label>
+            <select id="rol" name="rol" required>
+                <option value="">Seleccionar</option>
+                <option value="profesor">Profesor</option>
+                <option value="tutor_centro">Tutor Centro</option>
+                <option value="admin">Admin</option>
+            </select>
+            <br>
+            <label for="departamento">Departamento:</label>
+            <select id="departamento" name="departamento">
+                <option value="">Seleccionar</option>
+                <option value="matematicas">Matemáticas</option>
+                <option value="lengua">Lengua</option>
+                <option value="ciencias_sociales">Ciencias Sociales</option>
+            </select>
+            <br>
+            <label for="contrato">Tipo de Contrato:</label>
+            <select id="contrato" name="contrato">
+                <option value="">Seleccionar</option>
+                <option value="tiempo_completo">Tiempo Completo</option>
+                <option value="medio_tiempo">Medio Tiempo</option>
+                <option value="sustituto">Sustituto</option>
+            </select>
+            <br>
+            <label for="estado">Estado:</label>
+            <select id="estado" name="estado" required>
+                <option value="">Seleccionar</option>
+                <option value="activo">Activo</option>
+                <option value="en_licencia">En Licencia</option>
+                <option value="inactivo">Inactivo</option>
+            </select>
+            <br>
+            <label for="notas">Notas Adicionales:</label>
+            <textarea id="notas" name="notas"></textarea>
+            <br>
+            <label for="clave">Clave:</label>
+            <input type="password" id="clave" name="clave">
+            <br>
+            <button type="submit">Registrar Profesor</button>
+        </form>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Aplicación FCT. Todos los derechos reservados.</p>
+        <p>
+            <a href="" style="color: #94d2bd; text-decoration: underline;">Política
+                de Privacidad</a> |
+            <a href="" style="color: #94d2bd; text-decoration: underline;">Términos de
+                Servicio</a>
+        </p>
+    </footer>
+
+    <script>
+        // datos de la URL para el el id
+        const urlParams = new URLSearchParams(window.location.search);
+        const id = urlParams.get('id'); // Obtener el ID de la URL
+        const tabla = 'profesores';
+
+        document.addEventListener("DOMContentLoaded", function () {
+            gestionarSession();
+            if (id) {
+                rellenarDatosFormulario();
+            } else {
+                console.error('ID no encontrado en la URL');
+            }
+        });
+
+        async function gestionarSession() {
+            try {
+                const response = await fetch("/sesion");
+                if (response.ok) { // Si existe el server responde
+                    const data = await response.json();
+                    if (data.rol == 'admin') {
+                        cabeceraLogin(data);
+                    } else {
+                        window.location.href = "../panel_profesor.html";
+                    }
+                } else {
+                    cabeceraNoLogin();
+                    console.log('No estás logueado');
+                }
+            } catch (error) {
+                console.error('Error al gestionar la sesión:', error);
+            }
+        }
+
+        function cabeceraNoLogin() {
+            window.location.href = "/";
+        }
+
+        function cabeceraLogin(data) {
+            let enlacesUsuarios = document.getElementById('enlacesUsuarios');
+
+            enlacesUsuarios.innerHTML += `
+            <li><a href="../">Inicio</a></li>
+            <li><a class="cerrar" href="../registros.html">Registros</a></li>
+            <li><a class="cerrar" href="../panel_profesor.html">Gestion</a></li>
+            <li><a class="cerrar" href="../logout">Cerrar sesión</a></li>`;
+
+            enlacesUsuarios.innerHTML += ` Usuario: ${data.correo}`;
+        }
+
+        async function rellenarDatosFormulario() {
+            try {
+                const response = await fetch(`/datos/${tabla}/${id}`);
+                if (!response.ok) {
+                    throw new Error('Error al obtener los datos');
+                }
+                const data = await response.json();
+
+                // Accede al primer objeto del array
+                const itemData = data[0];
+                console.log(itemData);
+
+                const form = document.getElementById('formulario');
+                const entries = Object.entries(itemData);
+
+                entries.forEach(([key, value]) => {
+                    const input = form.elements[key];
+                    if (input) {
+                        // para evitar problemas de formato con la fecha pasar a yyyy-mm-dd
+                        if (key === 'fecha_nacimiento') {
+                            const date = new Date(value);
+                            const formattedDate = date.toISOString().split('T')[0];
+                            input.value = formattedDate;
+                        } else {
+                            input.value = value;
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error('Error al obtener los datos:', error);
+            }
+        }
+
+        document.getElementById("formulario").addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const datos = {};
+            const formulario = document.getElementById("formulario");
+
+            for (let element of formulario.elements) {
+                if (element.name) {
+                    datos[element.name] = element.value; // Rellenar el objeto con los datos del formulario
+                }
+            }
+
+            try {
+                const response = await fetch(`/actualizar/${tabla}/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(datos),
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    alert(result.mensaje);
+                    window.location.href = '../modificar.html';
+                } else {
+                    alert('Error: ' + result.mensaje);
+                }
+            } catch (error) {
+                console.error('Error al enviar la solicitud:', error);
+                alert('Hubo un error al procesar la solicitud');
+            }
+        });
+
+    </script>
+</body>
+
+</html>

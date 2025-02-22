@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+    <header>
+        <div class="logo">
+            <img class="logo_imagen" src="img/logo.png" alt="Logo">
+            <h1 class="titulo">Aplicación FCT</h1>
+        </div>
+        <nav class="navegacion">
+            <ul id="enlacesUsuarios">
+                
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <div class="contenedor_registro">
+            <h2>Bienvenido a la Aplicación FCT</h2>
+            <p>Selecciona una de las siguientes opciones para continuar:</p>
+            <div class="enlaces">
+                <a href="formularios/formulario_profesor.html">Profesores</a>
+                <a href="formularios/formulario_alumno.html">Alumnos</a>
+                <a href="formularios/formulario_empresa.html">Empresas</a>
+                <a href="formularios/formulario_contacto_fct.html">Contacto FCT</a>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Aplicación FCT. Todos los derechos reservados.</p>
+        <p>
+            <a href="" style="color: #94d2bd; text-decoration: underline;">Política
+                de Privacidad</a> |
+            <a href="" style="color: #94d2bd; text-decoration: underline;">Términos de
+                Servicio</a>
+        </p>
+    </footer>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            gestionarSession();
+        });
+
+        async function gestionarSession() {
+            try {
+                const response = await fetch("/sesion"); // Hacer una solicitud a tu servidor
+                if (response.ok) {
+                    // Si el usuario está logueado, obtenemos los datos
+                    const data = await response.json();
+                    cabeceraLogin(data);
+                } else {
+                    // Si no está logueado
+                    cabeceraNoLogin();
+                    console.log('No estás logueado');
+                }
+            } catch (error) {
+                console.error('Error al gestionar la sesión:', error);
+            }
+        }
+
+        function cabeceraNoLogin() {
+            window.location.href = "/";
+        }
+
+        function cabeceraLogin(data) {
+            let enlacesUsuarios = document.getElementById('enlacesUsuarios');
+
+            enlacesUsuarios.innerHTML += `
+            <li><a href="/">Inicio</a></li>
+            <li><a class="cerrar" href="/registros.html">Registros</a></li>
+            <li><a class="cerrar" href="/panel_profesor.html">Gestion</a></li>
+            <li><a class="cerrar" href="/logout">Cerrar sesión</a></li>`;
+
+            enlacesUsuarios.innerHTML += ` Usuario: ${data.correo}`;
+            
+        }
+        
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="../styles.css" rel="stylesheet">
+</head>
+
+<body>
+
+    <header>
+        <div class="logo">
+            <img class="logo_imagen" src="../img/logo.png" alt="Logo">
+            <h1 class="titulo">Aplicación FCT</h1>
+        </div>
+        <nav class="navegacion">
+            <ul id="enlacesUsuarios">
+
+            </ul>
+        </nav>
+    </header>
+
+    <main id="main">
+
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Aplicación FCT. Todos los derechos reservados.</p>
+        <p>
+            <a href style="color: #94d2bd; text-decoration: underline;">Política
+                de Privacidad</a> |
+            <a href style="color: #94d2bd; text-decoration: underline;">Términos de
+                Servicio</a>
+        </p>
+    </footer>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            gestionarSession();
+        });
+
+        async function gestionarSession() {
+            try {
+                const response = await fetch("/sesion"); // Hacer una solicitud a tu servidor
+                if (response.ok) {
+                    // Si el usuario está logueado, obtenemos los datos
+                    const data = await response.json();
+                    cabeceraLogin(data);
+                    // el await hace un poco lo que quiere aveces falla e imprime el profesor despues de alumno no se por que
+                    if (data.rol === 'admin') {
+                        await generarMain('profesores');
+                    }
+                    await generarMain('alumnos');
+                    await generarMain('contactos');
+                    await generarMain('empresa');
+                } else {
+                    // Si no esta logueado
+                    window.location.href = '../';
+                }
+            } catch (error) {
+                console.error('Error al gestionar la sesión:', error);
+            }
+        }
+
+        function cabeceraLogin(data) {
+            let enlacesUsuarios = document.getElementById('enlacesUsuarios');
+
+            enlacesUsuarios.innerHTML += `
+            <li><a href="/">Inicio</a></li>
+            <li><a class="cerrar" href="/registros.html">Registros</a></li>
+            <li><a class="cerrar" href="/panel_profesor.html">Gestion</a></li>
+            <li><a class="cerrar" href="/logout">Cerrar sesión</a></li>`;
+
+            enlacesUsuarios.innerHTML += ` Usuario: ${data.correo}`;
+
+        }
+
+
+        // funciones para mostrar todos los datos de las cuatro tablas principales
+        async function generarMain(tabla) {
+            fetch(`/datos/${tabla}`)
+                .then(response => response.json())
+                .then(data => {
+                    let main = document.getElementById('main');
+                    main.innerHTML += mostrarEliminar(data, tabla);
+                })
+                .catch(error => console.error('Error:', error));
+        }
+        // generar tabla
+        // Es parecida al de elimiar pero con un boton de modificar ._.
+        function mostrarEliminar(data, tabla) {
+            let html = `<h2>${tabla.charAt(0).toUpperCase() + tabla.slice(1)}</h2>`;
+            if (data.length === 0) {
+                html += `<h3>No hay registros</h3>`;
+                return html;
+            }
+
+            const entries = Object.keys(data[0]);
+
+            html += `<div class="contenedor_tabla">
+            <table>
+                <thead>
+                    <tr>`;
+
+            html += `<th>Acción</th>`;
+            // Agregar encabezados de la tabla
+            entries.forEach(entry => {
+                html += `<th>${entry}</th>`;
+            });
+
+            // Agregar columna extra para los botones de modificar
+            html += `</tr></thead>
+                <tbody>`;
+
+            // Generar filas de la tabla poner el boton de modificar con js
+            data.forEach(row => {
+                html += `<tr>`;
+                // boton con class event listener para modificar
+                html += `<td>
+                    <button data-id="${row.id}" data-tabla="${tabla}" class="modificar">Modificar</button>
+                </td>`;
+                entries.forEach(entry => {
+                    html += `<td>${row[entry]}</td>`;
+                });
+                html += `</tr>`;
+            });
+
+            html += `</tbody>
+            </table><br></div>`;
+
+            return html;
+        }
+
+        // lo que se encarga de redirigir a la pagina del formulario que correspo
+        document.addEventListener('click', async (e) => {
+            if (e.target.classList.contains('modificar')) {
+                const id = e.target.dataset.id;
+                const tabla = e.target.dataset.tabla;
+                if (tabla == 'alumnos') {
+                    window.location.href = `formularios_modificar/formulario_alumno.html?id=${id}`;
+                }else if (tabla == 'profesores') {
+                    window.location.href = `formularios_modificar/formulario_profesor.html?id=${id}`;
+                }else if (tabla == 'contactos') {
+                    window.location.href = `formularios_modificar/formulario_contacto_fct.html?id=${id}`;
+                }else if (tabla == 'empresa') {
+                    window.location.href = `formularios_modificar/formulario_empresa.html?id=${id}`;
+                }
+            }
+        });
+
+    </script>
+</body>
+
+</html>

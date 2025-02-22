@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+    <header>
+        <div class="logo">
+            <img class="logo_imagen" src="img/logo.png" alt="Logo">
+            <h1 class="titulo">Aplicación FCT</h1>
+        </div>
+        <nav class="navegacion">
+            <ul id="enlacesUsuarios">
+                <li><a href="/">Inicio</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="login">
+            <form action="/gestionar_login" method="POST" id="loginForm">
+                <h2>Iniciar Sesión</h2>
+                <div>
+                    <label for="correo">Correo:</label>
+                    <input type="text" name="correo" id="correo" required>
+                </div>
+                <div>
+                    <label for="clave">Clave:</label>
+                    <input type="password" name="clave" id="clave" required>
+                </div>
+                <button type="submit">Login</button>
+            </form>
+        </section>
+    </main>
+
+    <script>
+
+        document.addEventListener("DOMContentLoaded", function () {
+            gestionarSession();
+        });
+
+        async function gestionarSession() {
+            try {
+                const response = await fetch("/sesion"); // Hacer una solicitud a tu servidor
+                if (response.ok) {
+                    // Si el usuario está logueado, obtenemos los datos
+                    const data = await response.json();
+                    cabeceraLogin(data);
+                } else {
+                    // Si no está logueado
+                    cabeceraNoLogin();
+                    console.log('No estás logueado');
+                }
+            } catch (error) {
+                console.error('Error al gestionar la sesión:', error);
+            }
+        }
+
+        function cabeceraNoLogin() {
+            let enlacesUsuarios = document.getElementById('enlacesUsuarios');
+            enlacesUsuarios.innerHTML = `
+            <li><a href="/">Inicio</a></li>
+            <li><a class="cerrar" href="/formulario_login.html">Login</a></li>`;
+        }
+
+        function cabeceraLogin(data) {
+            window.location.href = "/";
+        }
+
+        document.getElementById("loginForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const correo = document.getElementById("correo").value;
+            const clave = document.getElementById("clave").value;
+
+            const response = await fetch("/gestionar_login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ correo, clave })
+            });
+
+            const data = await response.json();
+            if (data.mensaje === 'Nombre completo o contraseña incorrectos') {
+                alert(data.mensaje);
+            } else {
+                alert(data.mensaje);
+                window.location.href = '/';
+            }
+        });
+    </script>
+
+    <footer>
+        <p>&copy; 2025 Aplicación FCT. Todos los derechos reservados.</p>
+        <p>
+            <a href="" style="color: #94d2bd; text-decoration: underline;">Política
+                de Privacidad</a> |
+            <a href="" style="color: #94d2bd; text-decoration: underline;">Términos de
+                Servicio</a>
+        </p>
+    </footer>
+</body>
+
+</html>

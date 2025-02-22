@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+
+<body>
+
+    <header>
+        <div class="logo">
+            <img class="logo_imagen" src="../img/logo.png" alt="Logo">
+            <h1 class="titulo">Aplicación FCT</h1>
+        </div>
+        <nav class="navegacion">
+            <ul id="enlacesUsuarios">
+                
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <form action="" method="POST" id="formulario">
+            <h2>Registrar Información de la Empresa</h2>
+                <label for="nombre">Nombre de la Empresa:</label>
+                <input type="text" id="nombre" name="nombre" required>
+                <br>
+                <label for="razon_social">Razón Social:</label>
+                <input type="text" id="razon_social" name="razon_social">
+                <br>
+                <label for="tipo_empresa">Tipo de Empresa:</label>
+                <select id="tipo_empresa" name="tipo_empresa">
+                    <option value="">Seleccionar</option>
+                    <option value="sociedad_anónima">Sociedad Anónima</option>
+                    <option value="sociedad_limitada">Sociedad Limitada</option>
+                    <option value="autonomo">Autónomo</option>
+                </select>
+                <br>
+                <label for="nif">Número de Identificación Fiscal (NIF/CIF):</label>
+                <input type="text" id="nif" name="nif" required>
+                <br>
+                <label for="correo">Correo Electrónico:</label>
+                <input type="email" id="correo" name="correo" required>
+                <br>
+                <label for="telefono">Número de Teléfono:</label>
+                <input type="text" id="telefono" name="telefono">
+                <br>
+                <label for="direccion">Dirección:</label>
+                <textarea id="direccion" name="direccion"></textarea>
+                <br>
+                <label for="ciudad">Ciudad:</label>
+                <input type="text" id="ciudad" name="ciudad" required>
+                <br>
+                <label for="codigo_postal">Código Postal:</label>
+                <input type="text" id="codigo_postal" name="codigo_postal" required>
+                <br>
+                <label for="pais">País:</label>
+                <select id="pais" name="pais" required>
+                    <option value="">Seleccionar</option>
+                    <option value="España">España</option>
+                    <option value="Francia">Francia</option>
+                    <option value="Alemania">Alemania</option>
+                </select>
+                <br>
+                <label for="fecha_constitucion">Fecha de Constitución:</label>
+                <input type="date" id="fecha_constitucion" name="fecha_constitucion">
+                <br>
+                <label for="sector">Sector:</label>
+                <select id="sector" name="sector">
+                    <option value="">Seleccionar</option>
+                    <option value="tecnologia">Tecnología</option>
+                    <option value="salud">Salud</option>
+                    <option value="educacion">Educación</option>
+                </select>
+                <br>
+                <label for="num_empleados">Número de Empleados:</label>
+                <input type="number" id="num_empleados" name="num_empleados">
+                <br>
+                <label for="sitio_web">Sitio Web:</label>
+                <input type="url" id="sitio_web" name="sitio_web">
+                <br>
+                <label for="representante_legal">Representante Legal:</label>
+                <input type="text" id="representante_legal" name="representante_legal">
+                <br>
+                <label for="estado">Estado de la Empresa:</label>
+                <select id="estado" name="estado" required>
+                    <option value="">Seleccionar</option>
+                    <option value="activa">Activa</option>
+                    <option value="inactiva">Inactiva</option>
+                    <option value="liquidacion">En Liquidación</option>
+                </select>
+                <br>
+                <label for="notas">Notas Adicionales:</label>
+                <textarea id="notas" name="notas"></textarea>
+                <br>
+                <button type="submit">Registrar Empresa</button>
+            </form>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Aplicación FCT. Todos los derechos reservados.</p>
+        <p>
+            <a href="" style="color: #94d2bd; text-decoration: underline;">Política
+                de Privacidad</a> |
+            <a href="" style="color: #94d2bd; text-decoration: underline;">Términos de
+                Servicio</a>
+        </p>
+    </footer>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            gestionarSession();
+        });
+
+        async function gestionarSession() {
+            try {
+                const response = await fetch("/sesion"); // Hacer una solicitud a tu servidor
+                if (response.ok) {
+                    // Si el usuario está logueado, obtenemos los datos
+                    const data = await response.json();
+                    cabeceraLogin(data);
+                } else {
+                    // Si no está logueado
+                    cabeceraNoLogin();
+                    console.log('No estás logueado');
+                }
+            } catch (error) {
+                console.error('Error al gestionar la sesión:', error);
+            }
+        }
+
+        function cabeceraNoLogin() {
+            window.location.href = "/";
+        }
+
+        function cabeceraLogin(data) {
+            let enlacesUsuarios = document.getElementById('enlacesUsuarios');
+
+            enlacesUsuarios.innerHTML += `
+            <li><a href="../">Inicio</a></li>
+            <li><a class="cerrar" href="../registros.html">Registros</a></li>
+            <li><a class="cerrar" href="../panel_profesor.html">Gestion</a></li>
+            <li><a class="cerrar" href="../logout">Cerrar sesión</a></li>`;
+
+            enlacesUsuarios.innerHTML += ` Usuario: ${data.correo}`;
+            
+        }
+
+        document.getElementById("formulario").addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            // Creamos un objeto para almacenar los datos del formulario
+            const datos = {};
+            const formulario = document.getElementById("formulario");
+
+            for (let element of formulario.elements) {
+                if (element.name) {
+                    datos[element.name] = element.value;
+                }
+            }
+
+            try {
+                const response = await fetch('http://localhost:3000/insertarEmpresa', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(datos)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    alert(result.mensaje);
+                    window.location.href = '/registros.html';
+                } else {
+                    alert('Error: ' + result.mensaje);
+                }
+            } catch (error) {
+                console.error('Error al enviar la solicitud', error);
+                alert('Hubo un error al procesar la solicitud');
+            }
+        });
+        
+    </script>
+</body>
+
+</html>
