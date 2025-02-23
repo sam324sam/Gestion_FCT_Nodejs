@@ -90,22 +90,18 @@
                 .catch(error => console.error('Error:', error));
         }
 
-        // Parte de filtrado del nombre
+        // Parte de filtrado del datos de cada td de la tabla
         function filtrarTabla(tabla) {
             const input = document.getElementById(`buscar-${tabla}`);
             const filtro = input.value.toLowerCase();
-            // el tbody es para diferenciar en cual tabla se realiza la busqueda
             const tbody = document.getElementById(`cuerpo-${tabla}`);
-            const filas = Array.from(tbody.getElementsByTagName("tr")); // Convertir a array
+            const filas = Array.from(tbody.getElementsByTagName("tr"));
 
             filas.forEach(fila => {
                 const cells = fila.getElementsByTagName("td");
-                // Comprobar si alguna celda contiene el filtro
-                // Solo me genera 
                 const filaContainsfiltro = Array.from(cells).some(cell =>
                     cell.textContent.toLowerCase().includes(filtro)
                 );
-                // Mostrar u ocultar la fila según el resultado de la búsqueda
                 if (filaContainsfiltro) {
                     fila.style.display = "";
                 } else {

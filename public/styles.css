@@ -189,7 +189,27 @@ footer p {
     background-color: #94d2bd;
 }
 
-/*Tablas*/
+/*Tablas y parte de buscar en inputs*/
+.buscador {
+    margin: 10px;
+    border-radius: 20px; /* Un radio menor para un borde más suave */
+    width: 200px;
+    padding: 10px; /* Agrega espacio interno para mayor comodidad */
+    border: 1px solid #ccc; /* Borde suave */
+    font-size: 16px; /* Tamaño de fuente adecuado */
+    transition: border-color 0.3s ease, box-shadow 0.3s ease; /* Transición suave */
+}
+
+.buscador:focus {
+    border-color: #007BFF; /* Cambia el color del borde al enfocar */
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Sombra sutil al enfocar */
+}
+
+.buscador::placeholder {
+    color: #aaa; /* Color del texto del placeholder */
+    font-style: italic; /* Estilo itálico para el placeholder */
+}
+
 .contenedor_tabla {
     width: 100%;
     overflow-x: auto;

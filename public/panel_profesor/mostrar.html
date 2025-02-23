@@ -128,7 +128,7 @@
             return html;
         }
 
-        // Parte de filtrado del nombre
+        // Parte de filtrado del datos de cada td de la tabla
         function filtrarTabla(tabla) {
             const input = document.getElementById(`buscar-${tabla}`);
             const filtro = input.value.toLowerCase();
@@ -142,7 +142,7 @@
                 // Solo me genera 
                 const filaContainsfiltro = Array.from(cells).some(cell =>
                     cell.textContent.toLowerCase().includes(filtro) 
-                );
+                ); // Esto filtra para todos los datos
                 // Mostrar u ocultar la fila según el resultado de la búsqueda
                 if (filaContainsfiltro) {
                     fila.style.display = "";

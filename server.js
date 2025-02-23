@@ -37,7 +37,8 @@ app.get("/sesion", (req, res) => {
     if (req.session.correo) {
         res.json({
             correo: req.session.correo,
-            rol: req.session.rol
+            rol: req.session.rol,
+            nombre_completo: req.session.nombre_completo
         });
     } else {
         res.status(401).json({ mensaje: "No estás logueado" });

@@ -89,13 +89,17 @@
         }
 
         function cabeceraLogin(data) {
-            let enlacesUsuarios = document.getElementById("enlacesUsuarios");
-            enlacesUsuarios.innerHTML += `
-                <li><a href="/">Inicio</a></li>
-                <li><a class="cerrar" href="../../registros.html">Registros</a></li>
-                <li><a class="cerrar" href="../../panel_profesor.html">Gestion</a></li>
-                <li><a class="cerrar" href="../../logout">Cerrar sesión</a></li>`;
-            enlacesUsuarios.innerHTML += ` Usuario: ${data.correo}`;
+            if (data.rol == 'tutor_centro' || data.rol == 'admin') {
+                let enlacesUsuarios = document.getElementById('enlacesUsuarios');
+                enlacesUsuarios.innerHTML += `
+            <li><a href="/">Inicio</a></li>
+            <li><a class="cerrar" href="../../registros.html">Registros</a></li>
+            <li><a class="cerrar" href="../../panel_profesor.html">Gestion</a></li>
+            <li><a class="cerrar" href="../../logout">Cerrar sesión</a></li>`
+                enlacesUsuarios.innerHTML += ` Usuario: ${data.correo}`;
+            } else {
+                window.location.href = '../../';
+            }
         }
 
         // Tratar los datos que vengan de la url
