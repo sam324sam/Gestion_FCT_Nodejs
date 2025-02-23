@@ -7,7 +7,7 @@
     <title>Aplicacion FCT</title>
     <link href="../../styles.css" rel="stylesheet">
     <script src="../librerias/jspdf.js"></script>
-    <link rel="icon" href="../../img/logo.png" type="image/png">
+    <link type="image/png" href="../../img/logo.png" rel="icon">
 </head>
 
 <body>
@@ -26,28 +26,29 @@
 
     <main>
         <form id="formulario" action method="POST">
-            <h2>Asignar datos del convenio</h2>
+            <h2>Relacion con la empresa</h2>
             <p><strong>Empresa asignada:</strong> <span id="empresa"></span></p>
             <p><strong>Alumno seleccionado:</strong> <span id="alumno"></span></p>
 
-
             <label for="cif">CIF:</label>
-            <input type="text" id="cif" name="cif" required>
+            <input id="cif" name="cif" type="text" required>
             <br><br>
 
             <label for="direccion">Dirección:</label>
-            <input type="text" id="direccion" name="direccion" required>
+            <input id="direccion" name="direccion" type="text" required>
             <br><br>
 
             <label for="representante">Representante:</label>
-            <input type="text" id="representante" name="representante" required>
+            <input id="representante" name="representante" type="text" required>
+            <br><br>
+
+            <label for="tutor">Nombre y Apellidos del Tutor de Empresa:</label>
+            <input id="tutor" name="tutor" type="text" required>
             <br><br>
 
             <button type="submit">Guardar</button>
         </form>
     </main>
-
-
 
     <footer>
         <p>&copy; 2025 Aplicación FCT. Todos los derechos reservados.</p>
@@ -60,12 +61,9 @@
     </footer>
 
     <script>
-        // el import para generarme los pdf
-        // Variables globales
         let idAlumno = null;
         let nombreAlumno = "";
         let empresaAsignada = "";
-
         document.addEventListener("DOMContentLoaded", async function () {
             gestionarSession();
             prellenarDatos();
@@ -119,49 +117,47 @@
         document.getElementById("formulario").addEventListener("submit", async function (event) {
             event.preventDefault();
 
-            // Obtener los valores ingresados (vger para hacer un foreach)
             const cif = document.getElementById("cif").value;
             const direccion = document.getElementById("direccion").value;
             const representante = document.getElementById("representante").value;
-            // Validar datos
-            if (!cif || !direccion || !representante) {
+            const tutor = document.getElementById("tutor").value;
+
+            if (!cif || !direccion || !representante || !tutor) {
                 alert("Por favor, completa todos los campos.");
+                return;
             }
 
-            // Crear el PDF
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
             const img = new Image();
             img.src = "../../img/logo.png";
 
             img.onload = async function () {
-                doc.addImage(img, "PNG", 15, 10, 40, 20); // Posicionarlo o si no sobrepone como en php
+                doc.addImage(img, "PNG", 15, 10, 40, 20);
                 doc.setFontSize(16);
                 doc.text("Asignación de Empresa - FCT", 70, 20);
                 doc.setFontSize(12);
-                doc.text(`Empresa: ${empresaAsignada}`, 20, 60);
-                doc.text(`Cif: ${cif}`, 20, 50);
-                doc.text(`Direccion: ${direccion}`, 20, 70);
-                doc.text(`Representante: ${representante}`, 20, 80);
-                // firmas
-                doc.line(20, 120, 80, 120);
-                doc.text("Firma del Alumno", 25, 125);
+                doc.text(`Empresa: ${empresaAsignada}`, 20, 40);
+                doc.text(`CIF: ${cif}`, 20, 50);
+                doc.text(`Dirección: ${direccion}`, 20, 60);
+                doc.text(`Representante: ${representante}`, 20, 70);
+                doc.text(`Tutor de Empresa: ${tutor}`, 20, 80);
 
-                doc.line(120, 120, 180, 120);
-                doc.text("Firma de la Empresa", 125, 125);
+                doc.line(20, 150, 80, 150);
+                doc.text("Firma del Alumno", 25, 155);
 
-                // Descargar el PDF para cliente
-                doc.save(`Convenio_${nombreAlumno}.pdf`);
+                doc.line(120, 150, 180, 150);
+                doc.text("Firma de la Empresa", 125, 155);
+
+                doc.save(`Relacion_con_la_empresa${nombreAlumno}.pdf`);
                 await actualizarEstado();
             };
         });
 
-        // Actualizar estado del alumno
         async function actualizarEstado() {
-            const nombreEstados = 'PENDIENTE RELACION DE ALUMNOS';
+            const nombreEstados = 'PENDIENTE PROGRAMA Y HORARIO';
             const datos = { 'estado_fct': nombreEstados };
             const tabla = 'alumnos';
-            console.log(datos);
             try {
                 const response = await fetch(`/actualizar/${tabla}/${idAlumno}`, {
                     method: 'PUT',
@@ -175,7 +171,7 @@
 
                 if (response.ok) {
                     alert(result.mensaje);
-                    window.location.href = "realizar_convenio.html";
+                    window.location.href = "relacion_alumnos.html";
                 } else {
                     alert('Error: ' + result.mensaje);
                 }

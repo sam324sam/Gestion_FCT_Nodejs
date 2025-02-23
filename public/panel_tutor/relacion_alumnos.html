@@ -25,7 +25,7 @@
 
     <main id="main">
         <h2>Selecciona un curso para ver los alumnos</h2>
-        <p>Recuerda que el alumno debe tener empresa para aparecer</p>
+        <p>Recuerde que en esta fase solo apareceran los alumnos con estado PENDIENTE RELACION DE ALUMNOS despues de realizar el convenio</p>
         <select id="cursoSeleccionado">
             <option value="">Seleccionar</option>
         </select>
@@ -123,7 +123,7 @@
                 let contador = 0;
 
                 alumnos.forEach(alumno => {
-                    if (alumno.grado_curso == curso && alumno.empresa_asignada != null && alumno.estado_fct == 'PENDIENTE CONVENIO') {
+                    if (alumno.grado_curso == curso && alumno.empresa_asignada != null && alumno.estado_fct == 'PENDIENTE RELACION DE ALUMNOS') {
                         const alumnoId = alumno.id;
                         tbody.innerHTML += `
                         <tr>
@@ -131,7 +131,7 @@
                             <td>${alumno.correo}</td>
                             <td>${alumno.telefono || "N/A"}</td>
                             <td>
-                                <button onclick="redirigirFormulario('formulario_convenio.html?id=${alumnoId}&nombre=${encodeURIComponent(alumno.nombre_completo)}&empresa=${encodeURIComponent(alumno.empresa_asignada || '')}')">
+                                <button onclick="redirigirFormulario('formulario_relacion.html?id=${alumnoId}&nombre=${encodeURIComponent(alumno.nombre_completo)}&empresa=${encodeURIComponent(alumno.empresa_asignada || '')}')">
                                     Asignar datos
                                 </button>
                             </td>

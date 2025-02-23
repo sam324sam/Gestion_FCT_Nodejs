@@ -155,7 +155,7 @@ footer p {
 /*Pagina de registros*/
 .contenedor_registro {
     width: 90%;
-    max-width: 600px;
+    max-width: 900px;
     margin: 32px auto;
     background-color: #ffffff;
     border-radius: 8px;
@@ -169,31 +169,22 @@ footer p {
     justify-content: center;
     gap: 16px;
     margin-top: 20px;
+    flex-wrap: wrap;
 }
 
 .contenedor_registro a {
-    padding: 12px 24px;
+    padding: 12px 14px;
     background-color: #005f73;
     color: #fff;
     text-decoration: none;
     border-radius: 4px;
     transition: background-color 0.3s;
+    width: 100px;
+    height: auto;
 }
 
 .contenedor_registro a:hover {
     background-color: #94d2bd;
-}
-
-/*Contenedor de exito*/
-.resultado {
-    margin: auto;
-    margin-top: 10px;
-    padding-top: 10px;
-    padding-bottom: 25px;
-    width: 60%;
-    text-align: center;
-    border: rgb(168, 58, 58) solid 1px;
-    border-radius: 20px;
 }
 
 /*Tablas*/
