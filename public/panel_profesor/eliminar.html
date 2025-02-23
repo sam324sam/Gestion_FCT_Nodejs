@@ -18,13 +18,13 @@
         </div>
         <nav class="navegacion">
             <ul id="enlacesUsuarios">
-                
+
             </ul>
         </nav>
     </header>
 
     <main id="main">
-        
+
     </main>
 
     <footer>
@@ -74,7 +74,7 @@
             <li><a class="cerrar" href="/logout">Cerrar sesión</a></li>`;
 
             enlacesUsuarios.innerHTML += ` Usuario: ${data.correo}`;
-            
+
         }
 
 
@@ -89,22 +89,23 @@
                 .catch(error => console.error('Error:', error));
         }
         // generar tabla
-        
+
         function mostrarEliminar(data, tabla) {
             let html = `<h2>${tabla.charAt(0).toUpperCase() + tabla.slice(1)}</h2>`;
             if (data.length === 0) {
                 html += `<h3>No hay registros</h3>`;
                 return html;
             }
-            
-            const entries = Object.keys(data[0]);
-            
-            html += `<div class="contenedor_tabla">
-            <table>
-                <thead>
-                    <tr>`;
 
-                html += `<th>Acción</th>`;
+            const entries = Object.keys(data[0]);
+
+            html += `<div class="contenedor_tabla">
+                <input type="text" id="buscar-${tabla}" class="buscador" placeholder="Buscar..." onkeyup="filtrarTabla('${tabla}')">
+                <table>
+                    <thead>
+                        <tr>`;
+
+            html += `<th>Acción</th>`;
             // Agregar encabezados de la tabla
             entries.forEach(entry => {
                 html += `<th>${entry}</th>`;
@@ -112,7 +113,7 @@
 
             // Agregar columna extra para los botones de eliminar
             html += `</tr></thead>
-                <tbody>`;
+                <tbody id="cuerpo-${tabla}">`;
 
             // Generar filas de la tabla poner el boton de eliminar con js
             data.forEach(row => {
@@ -129,35 +130,60 @@
 
             html += `</tbody>
             </table><br></div>`;
-            
+
             return html;
         }
 
-    // lo que se encarga del borrado con la data id y tabla
-    document.addEventListener('click', async (e) => {
-        if (e.target.classList.contains('eliminar')) {
-            const id = e.target.dataset.id;
-            const tabla = e.target.dataset.tabla;
+        // Parte de filtrado del nombre
+        function filtrarTabla(tabla) {
+            const input = document.getElementById(`buscar-${tabla}`);
+            const filtro = input.value.toLowerCase();
+            // el tbody es para diferenciar en cual tabla se realiza la busqueda
+            const tbody = document.getElementById(`cuerpo-${tabla}`);
+            const filas = Array.from(tbody.getElementsByTagName("tr")); // Convertir a array
 
-            if (confirm(`¿Seguro que quieres eliminar el registro ${id} de ${tabla}?`)) {
-                try {
-                    const response = await fetch(`/eliminar/${tabla}/${id}`, {
-                        method: 'DELETE',
-                    });
+            filas.forEach(fila => {
+                const cells = fila.getElementsByTagName("td");
+                // Comprobar si alguna celda contiene el filtro
+                // Solo me genera 
+                const filaContainsfiltro = Array.from(cells).some(cell =>
+                    cell.textContent.toLowerCase().includes(filtro)
+                );
+                // Mostrar u ocultar la fila según el resultado de la búsqueda
+                if (filaContainsfiltro) {
+                    fila.style.display = "";
+                } else {
+                    fila.style.display = "none";
+                }
+                fila.style.display = filaContainsfiltro ? "" : "none";
+            });
+        }
 
-                    const data = await response.json();
-                    if (response.ok) {
-                        alert(data.mensaje);
-                        location.reload(); // Recargar la página para actualizar la tabla
-                    } else {
-                        alert(`Error: ${data.error}`);
+        // lo que se encarga del borrado con la data id y tabla
+        document.addEventListener('click', async (e) => {
+            if (e.target.classList.contains('eliminar')) {
+                const id = e.target.dataset.id;
+                const tabla = e.target.dataset.tabla;
+
+                if (confirm(`¿Seguro que quieres eliminar el registro ${id} de ${tabla}?`)) {
+                    try {
+                        const response = await fetch(`/eliminar/${tabla}/${id}`, {
+                            method: 'DELETE',
+                        });
+
+                        const data = await response.json();
+                        if (response.ok) {
+                            alert(data.mensaje);
+                            location.reload(); // Recargar la página para actualizar la tabla
+                        } else {
+                            alert(`Error: ${data.error}`);
+                        }
+                    } catch (error) {
+                        console.error('Error al eliminar:', error);
                     }
-                } catch (error) {
-                    console.error('Error al eliminar:', error);
                 }
             }
-        }
-    });
+        });
 
 
     </script>

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subir Documentos Firmados</title>
+    <link href="../../styles.css" rel="stylesheet">
+    <link rel="icon" href="../../img/logo.png" type="image/png">
+</head>
+
+<body>
+    <header>
+        <div class="logo">
+            <img class="logo_imagen" src="../../img/logo.png" alt="Logo">
+            <h1 class="titulo">Aplicación FCT</h1>
+        </div>
+        <nav class="navegacion">
+            <ul id="enlacesUsuarios"></ul>
+        </nav>
+    </header>
+
+    <main>
+        <form id="formulario" enctype="multipart/form-data">
+            <h2>Subir Documentos Firmados</h2>
+
+            <label for="buscador">Buscar Alumno (Este campo es para el buscar rapido al alumno)</label>
+            <input type="text" id="buscador" placeholder="Escriba nombre completo para buscar..."
+                onkeyup="filtrarAlumnos()">
+            <br><br>
+
+            <label for="alumno">Alumno:</label>
+            <select id="alumno" name="alumno" required>
+                <option value="">Seleccione un alumno</option>
+            </select>
+            <br><br>
+
+            <label for="ruta_documento">Tipo de Documento:</label>
+            <select id="ruta_documento" name="ruta_documento" required>
+                <option value="">Seleccione un tipo</option>
+                <option value="documentosPDF/asignar_datos/">Asignar datos</option>
+                <option value="documentosPDF/realizar_convenio/">Realizar convenio</option>
+                <option value="documentosPDF/relacion_alumnos/">Relación de alumnos</option>
+                <option value="documentosPDF/hojas_firmas/">Hojas de firmas</option>
+            </select>
+            <br><br>
+
+            <label for="documento">Subir Documento:</label>
+            <input type="file" id="documento" name="documento" accept=".pdf,.jpg,.png" required>
+            <br><br>
+
+            <button type="submit">Subir Documento</button>
+        </form>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Aplicación FCT. Todos los derechos reservados.</p>
+    </footer>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", async function () {
+            await gestionarSession();
+            await generarSelect('alumnos', 'alumno');
+        });
+
+        async function gestionarSession() {
+            try {
+                const response = await fetch("/sesion");
+                if (response.ok) {
+                    const data = await response.json();
+                    cabeceraLogin(data);
+                } else {
+                    cabeceraNoLogin();
+                }
+            } catch (error) {
+                console.error('Error al gestionar la sesión:', error);
+            }
+        }
+
+        function cabeceraNoLogin() {
+            window.location.href = "../../";
+        }
+
+        function cabeceraLogin(data) {
+            let enlacesUsuarios = document.getElementById('enlacesUsuarios');
+            enlacesUsuarios.innerHTML += `
+            <li><a href="../../">Inicio</a></li>
+            <li><a class="cerrar" href="../../registros.html">Registros</a></li>
+            <li><a class="cerrar" href="../../panel_profesor.html">Gestion</a></li>
+            <li><a class="cerrar" href="../../logout">Cerrar sesión</a></li>`;
+            enlacesUsuarios.innerHTML += ` Usuario: ${data.correo}`;
+        }
+
+        async function generarSelect(tablaSelect, idSelect) {
+            try {
+                const response = await fetch(`/datos/${tablaSelect}`);
+                const data = await response.json();
+
+                let select = document.getElementById(idSelect);
+                data.forEach(element => {
+                    select.innerHTML += `<option value="${element.nombre_completo}">${element.nombre_completo}</option>`;
+                });
+
+            } catch (error) {
+                console.error('Error al cargar los alumnos:', error);
+            }
+        }
+
+        //Filtro para alumnos (toma valores del select y al dar al boton asigna el valor buscado al select si lo encuentra)
+        // Nota no se si usar esto para el mostrar de alumnos o hacer por id y hrfe
+        function filtrarAlumnos() {
+            let input = document.getElementById('buscador').value.toLowerCase();
+            let select = document.getElementById('alumno');
+            // Convertir a array (parece que el select da un array de opciones)
+            let opciones = Array.from(select.getElementsByTagName('option'));
+
+            opciones.forEach(opcion => {
+                let texto = opcion.textContent.toLowerCase();
+                if (texto === input) {
+                    select.value = opcion.value; // Asigna el valor al <select>
+                }
+            });
+        }
+
+        // llevo el documento al servidor para guardar (Realizar subcarpeta de guardar y si hay tiempo un boton para mostrar archivos subidos)
+        // No sube nada no logrege que le pasara el archivo al servidor
+        document.getElementById("formulario").addEventListener("submit", async function (event) {
+            event.preventDefault();
+
+            // Hay algo malo al pasar los datos por que el req.body del servidor le llega null asi que no he podido arreglarlo
+            let datos = {};
+            let formulario = document.getElementById("formulario");
+
+            for (let element of formulario.elements) {
+                if (element.name) {
+                    datos[element.name] = element.value || null;
+                }
+            }
+            console.log(datos);
+            console.log(datos[0])
+            try {
+                const response = await fetch("http://localhost:3000/subir_documento", {
+                    method: "POST",
+                    body: datos
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    alert(result.mensaje);
+                } else {
+                    alert("Error: " + result.mensaje);
+                }
+            } catch (error) {
+                console.error("Error al subir el documento:", error);
+                alert("Hubo un error al subir el documento.");
+            }
+        });
+
+    </script>
+</body>
+
+</html>

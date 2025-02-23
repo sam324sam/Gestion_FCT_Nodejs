@@ -167,9 +167,11 @@ footer p {
 .enlaces {
     display: flex;
     justify-content: center;
+    margin: auto;
     gap: 16px;
     margin-top: 20px;
     flex-wrap: wrap;
+    width: 90%;
 }
 
 .contenedor_registro a {

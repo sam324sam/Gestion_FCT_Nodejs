@@ -1,8 +1,12 @@
-# Gestion_FCT_Nodejs
+# Gestion FCT con nodejs
 
 ## Descripción
 
 Este es un proyecto de principiante diseñado para aprender Node.js. La aplicación simula la gestión de la asignación de empresas a alumnos de Formación en Centros de Trabajo (FCT).
+
+<div align="center">
+  <img src="imgGithub/inicioApp.png" alt="Inicio" width="900">
+</div>
 
 ## Funcionalidades Clave
 
@@ -18,6 +22,7 @@ Este es un proyecto de principiante diseñado para aprender Node.js. La aplicaci
 - JavaScript
 - HTML/CSS
 - Fetch API
+-  [Libreria JSPDF](https://github.com/parallax/jsPDF).
 
 ## Instalación
 
@@ -36,7 +41,14 @@ Este es un proyecto de principiante diseñado para aprender Node.js. La aplicaci
    npm install
    ```
 
-4. Ejecuta la aplicación:
+4. Usar una aplicacion de gestion de base de dato y exportar la db de la carpeta impotDB/
+   La relacion debe verce de esta forma
+
+<div align="center">
+  <img src="imgGithub/estructuraDB.png" alt="Inicio" width="900">
+</div>
+
+6. Ejecuta la aplicación:
    ```bash
    npm start
    ```

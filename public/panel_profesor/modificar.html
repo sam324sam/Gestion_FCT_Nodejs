@@ -85,13 +85,39 @@
                 .then(response => response.json())
                 .then(data => {
                     let main = document.getElementById('main');
-                    main.innerHTML += mostrarEliminar(data, tabla);
+                    main.innerHTML += mostrarModificar(data, tabla);
                 })
                 .catch(error => console.error('Error:', error));
         }
+
+        // Parte de filtrado del nombre
+        function filtrarTabla(tabla) {
+            const input = document.getElementById(`buscar-${tabla}`);
+            const filtro = input.value.toLowerCase();
+            // el tbody es para diferenciar en cual tabla se realiza la busqueda
+            const tbody = document.getElementById(`cuerpo-${tabla}`);
+            const filas = Array.from(tbody.getElementsByTagName("tr")); // Convertir a array
+
+            filas.forEach(fila => {
+                const cells = fila.getElementsByTagName("td");
+                // Comprobar si alguna celda contiene el filtro
+                // Solo me genera 
+                const filaContainsfiltro = Array.from(cells).some(cell =>
+                    cell.textContent.toLowerCase().includes(filtro)
+                );
+                // Mostrar u ocultar la fila según el resultado de la búsqueda
+                if (filaContainsfiltro) {
+                    fila.style.display = "";
+                } else {
+                    fila.style.display = "none";
+                }
+                fila.style.display = filaContainsfiltro ? "" : "none";
+            });
+        }
+
         // generar tabla
         // Es parecida al de elimiar pero con un boton de modificar ._.
-        function mostrarEliminar(data, tabla) {
+        function mostrarModificar(data, tabla) {
             let html = `<h2>${tabla.charAt(0).toUpperCase() + tabla.slice(1)}</h2>`;
             if (data.length === 0) {
                 html += `<h3>No hay registros</h3>`;
@@ -101,9 +127,10 @@
             const entries = Object.keys(data[0]);
 
             html += `<div class="contenedor_tabla">
-            <table>
-                <thead>
-                    <tr>`;
+                <input type="text" id="buscar-${tabla}" class="buscador" placeholder="Buscar..." onkeyup="filtrarTabla('${tabla}')">
+                <table>
+                    <thead>
+                        <tr>`;
 
             html += `<th>Acción</th>`;
             // Agregar encabezados de la tabla
@@ -113,7 +140,7 @@
 
             // Agregar columna extra para los botones de modificar
             html += `</tr></thead>
-                <tbody>`;
+                <tbody id="cuerpo-${tabla}">`;
 
             // Generar filas de la tabla poner el boton de modificar con js
             data.forEach(row => {

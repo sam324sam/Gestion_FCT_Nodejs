@@ -18,13 +18,13 @@
         </div>
         <nav class="navegacion">
             <ul id="enlacesUsuarios">
-                
+
             </ul>
         </nav>
     </header>
 
     <main id="main">
-        
+
     </main>
 
     <footer>
@@ -74,7 +74,7 @@
             <li><a class="cerrar" href="/logout">Cerrar sesión</a></li>`;
 
             enlacesUsuarios.innerHTML += ` Usuario: ${data.correo}`;
-            
+
         }
 
         // funciones para mostrar todos los datos de las cuatro tablas principales
@@ -89,36 +89,70 @@
                 .catch(error => console.error('Error:', error));
         }
         // generar tabla
-        function mostrar(data, titulo) {
-            let html = `<h2>${titulo.charAt(0).toUpperCase() + titulo.slice(1)}</h2>`; // solo lo pone bonito con mayus al inicio
+        function mostrar(data, tabla) {
+            let html = `<h2>${tabla.charAt(0).toUpperCase() + tabla.slice(1)}</h2>`; // Solo lo pone bonito con mayuscula al inicio
             if (data.length === 0) {
                 html += `<h3>No hay registros</h3>`;
                 return html;
             }
+
             const entries = Object.keys(data[0]);
+
             html += `
-            <div class="contenedor_tabla">
-            <table>
-                <thead>
-                    <tr>`;
+                    <div class="contenedor_tabla">
+                        <input type="text" id="buscar-${tabla}" class="buscador" placeholder="Buscar..." onkeyup="filtrarTabla('${tabla}')">
+                        <table>
+                            <thead>
+                                <tr>`;
+
             entries.forEach(entry => {
                 html += `<th>${entry}</th>`;
             });
+
             html += `</tr>
-                </thead>
-                <tbody>`;
-            data.forEach(row => {
+            </thead>
+            <tbody id="cuerpo-${tabla}">`;
+
+            data.forEach(fila => {
                 html += `<tr>`;
                 entries.forEach(entry => {
-                    html += `<td>${row[entry]}</td>`;
+                    html += `<td>${fila[entry]}</td>`;
                 });
                 html += `</tr>`;
             });
+
             html += `</tbody>
-            </table><br></div>`;
+                    </table><br>
+                </div>`;
+
             return html;
         }
-        
+
+        // Parte de filtrado del nombre
+        function filtrarTabla(tabla) {
+            const input = document.getElementById(`buscar-${tabla}`);
+            const filtro = input.value.toLowerCase();
+            // el tbody es para diferenciar en cual tabla se realiza la busqueda
+            const tbody = document.getElementById(`cuerpo-${tabla}`);
+            const filas = Array.from(tbody.getElementsByTagName("tr")); // Convertir a array
+
+            filas.forEach(fila => {
+                const cells = fila.getElementsByTagName("td");
+                // Comprobar si alguna celda contiene el filtro
+                // Solo me genera 
+                const filaContainsfiltro = Array.from(cells).some(cell =>
+                    cell.textContent.toLowerCase().includes(filtro) 
+                );
+                // Mostrar u ocultar la fila según el resultado de la búsqueda
+                if (filaContainsfiltro) {
+                    fila.style.display = "";
+                } else {
+                    fila.style.display = "none";
+                }
+                fila.style.display = filaContainsfiltro ? "" : "none";
+            });
+        }
+
     </script>
 </body>
 

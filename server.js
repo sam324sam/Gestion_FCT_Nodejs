@@ -2,9 +2,11 @@ const express = require('express');
 const session = require('express-session');
 const path = require('path');
 const mysql = require("mysql2");
+const fileUpload = require('express-fileupload');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
 
 // Configurar la conexión a MySQL
 const db = mysql.createConnection({
@@ -25,13 +27,13 @@ db.connect((err) => {
 
 // Configuración de la sesión
 app.use(session({
-    secret: 'tu-secreto',
+    secret: 'contraseña',
     resave: false,
     saveUninitialized: true,
 }));
 
 //Acceder a datps de la seccion
-app.get("/sesion", (req, res) => { //No sirve ahora de nada
+app.get("/sesion", (req, res) => {
     if (req.session.correo) {
         res.json({
             correo: req.session.correo,
@@ -52,12 +54,16 @@ app.get("/logout", (req, res) => {
     });
 });
 
+// Configuración de directorio publico de todos los html
+app.use(express.static(path.join(__dirname, 'public')));
+const uploadDir = path.join(__dirname, 'uploads'); // esto es lo que usa ppara la libreria
+
 // Middleware para parsear JSON
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // Para manejar formularios de html
-
-// Configuración de directorio publico de todos los html
-app.use(express.static(path.join(__dirname, 'public')));
+// Parte para subir los pdf (Ya decia yo que no funcionaba)
+app.use(fileUpload());
+app.use(express.static(uploadDir));
 
 //Gestionar el login
 app.post('/gestionar_login', (req, res) => {
@@ -211,7 +217,7 @@ async function insertar(tabla, datos, req) {
     } catch (error) {
         // En caso de error dentro de la función
         console.error('Error en la función insertar:', error.message);
-        throw new Error('Error inesperado al procesar la inserción'); // Rechazamos la promesa con un mensaje de error (No usar el rejetc de la promesa o si no bum)
+        throw new Error('Error inesperado al procesar la inserción'); // Rechaza la promesa con un mensaje de error (No usar el rejetc de la promesa o si no bum)
     }
 }
 
@@ -258,14 +264,13 @@ async function actualizar(tabla, id, datos, req, res) {
 
 // Eliminar (El delete es un verbo del formualrio como el get y el post)
 app.delete('/eliminar/:tabla/:id', (req, res) => {
+    const { tabla, id } = req.params;
     // gestion simple de seguridad (hacer un metodo aparte si hay tiempo)
     if (!req.session.correo) {
         return res.status(401).json({ error: 'No tienes una sesión activa' });
     } else if (req.session.rol != 'admin' && tabla == 'profesores') {
         return res.status(401).json({ error: 'No tienes permisos para realizar esta acción' });
     }
-
-    const { tabla, id } = req.params;
 
     const sql = `DELETE FROM ?? WHERE id = ?`;
 
@@ -278,7 +283,6 @@ app.delete('/eliminar/:tabla/:id', (req, res) => {
 });
 
 // consultar todos los datos en una tabla sin where
-// Consultar todos los datos en una tabla sin WHERE
 app.get('/datos/:tabla', async (req, res) => {
     try {
         const { tabla } = req.params;
@@ -331,6 +335,7 @@ app.get('/datos/:tabla/:id', async (req, res) => {
     }
 });
 
+// Funcion para cambiar datos en x tabla. Usado en modificar y cambiar estados
 app.put('/actualizar/:tabla/:id', async (req, res) => {
     const { tabla, id } = req.params;
     const datos = req.body;
@@ -346,6 +351,47 @@ app.put('/actualizar/:tabla/:id', async (req, res) => {
         console.error('Error en la operación de actualización:', error);
         res.status(500).json({ mensaje: error.message || 'Error en el servidor al procesar la solicitud' });
     }
+});
+
+// subir el archivo x. (Ver para realizarlo con multer la libreria para no usar el express.mv)
+app.post('/subir_documento', (req, res) => {
+    const datos = req.body;
+    const { documento } = req.files || {};
+
+    console.log('Documento:', documento);
+    console.log('Datos del formulario:', datos);
+
+    // Rutas admitidas
+    const rutasAdmitidas = [
+        'documentosPDF/asignar_datos/',
+        'documentosPDF/realizar_convenio/',
+        'documentosPDF/relacion_alumnos/',
+        'documentosPDF/hojas_firmas/'
+    ];
+
+    // Verifica si la ruta de documento es permitida
+    if (!rutasAdmitidas.includes(datos.ruta_documento)) {
+        return res.status(400).json({ mensaje: 'Ruta de documento no permitida' });
+    }
+
+    // Verifica si hay archivos
+    if (!documento) {
+        return res.status(400).json({ mensaje: 'No se ha subido ningún documento' });
+    }
+
+    // Define la ruta de destino
+    // el path join no lo entiendo mucho segun la documentacion da formato de ruta
+    const rutaFinal = path.join(uploadDir, `${datos.ruta_documento}${datos.alumno}_${Date.now()}${path.extname(documento.name)}`);
+    console.log('Ruta final para guardar el documento:', rutaFinal);
+
+    // Mover el archivo dentro del servidor
+    documento.mv(rutaFinal, (err) => {
+        if (err) {
+            console.error('Error al mover el archivo:', err);
+            return res.status(500).json({ mensaje: 'Error al subir el documento' });
+        }
+        res.status(200).json({ mensaje: 'Documento subido con éxito', ruta: rutaFinal });
+    });
 });
 
 // Iniciar el servidor
