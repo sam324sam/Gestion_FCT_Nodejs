@@ -1,3 +1,4 @@
+![Estado](https://img.shields.io/badge/Estado-En%20proceso-yellow?style=plastic)
 # Gestion FCT con nodejs
 
 ## Descripción
